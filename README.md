@@ -15,3 +15,16 @@ Run AStarTest.java and select a input for create the algorithm area. The correct
 - Line 4+: row and column position of a block node in the area separated by "-".
 
 Example inputs are in the "test inputs" folder.
+Test input 3 example:
+```
+Area (cost: 60):
+
+   0  1  2  3  
+0  -  -  -  -  
+1  I  *  *  -  
+2  -  B  *  -  
+3  -  B  *  -  
+4  -  B  *  -  
+5  -  B  F  -  
+6  -  -  -  - 
+```
