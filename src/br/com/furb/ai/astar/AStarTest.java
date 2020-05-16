@@ -1,6 +1,12 @@
 package br.com.furb.ai.astar;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+
+import javax.swing.JFileChooser;
 
 /**
  * Tests for the algorithm.
@@ -8,70 +14,77 @@ import java.util.List;
 public class AStarTest {
 
 	public static void main(String[] args) {
-		AStar aStar = getExample1();
-		List<Node> path = aStar.findPath();
-		System.out.println("Example 1 (cost: " + aStar.getTotalCost(path) + "):\n");
-		System.out.println(aStar.getGraphicArea(path));
+		try {
+			JFileChooser chooser = new JFileChooser();
+			if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+				// initialize variables to use below
+				int rows = 0, cols = 0;
+				Node initialNode = null, finalNode = null;
+				List<int[]> blocks = new ArrayList<>();
 
-		aStar = getExample2();
-		path = aStar.findPath();
-		System.out.println("----------------------");
-		System.out.println("Example 2 (cost: " + aStar.getTotalCost(path) + "):\n");
-		System.out.println(aStar.getGraphicArea(path));
+				// get and read file's lines
+				File file = chooser.getSelectedFile();
+				try (Scanner scanner = new Scanner(file)) {
+					int lineNumber = 1;
+					while (scanner.hasNextLine()) {
+						String line = scanner.nextLine();
+						// based on lineNumber get the rows, cols
+						// initial and final node
+						// and by the default are the blocks
+						switch (lineNumber) {
+						case 1:
+							String[] parts = line.split(",");
+							rows = Integer.parseInt(parts[0].trim());
+							cols = Integer.parseInt(parts[1].trim());
+							break;
+						case 2:
+							initialNode = getNodeByInput(line);
+							break;
+						case 3:
+							finalNode = getNodeByInput(line);
+							break;
+						default:
+							parts = line.split("-");
+							int row = Integer.parseInt(parts[0].trim());
+							int col = Integer.parseInt(parts[1].trim());
+							int[] object = { row, col };
+							blocks.add(object);
+						}
+						lineNumber++;
+					}
+				}
 
-		aStar = getExample3();
-		path = aStar.findPath();
-		System.out.println("----------------------");
-		System.out.println("Example 3 (cost: " + aStar.getTotalCost(path) + "):\n");
-		System.out.println(aStar.getGraphicArea(path));
+				// create algorithm object based in above informations
+				AStar aStar = new AStar(rows, cols, initialNode, finalNode);
+				int[][] blocksArray = new int[blocks.size()][];
+				blocks.toArray(blocksArray);
+				aStar.setBlocks(blocksArray);
+
+				// get and print the area with the path
+				List<Node> path = aStar.findPath();
+				System.out.println("Area (cost: " + aStar.getTotalCost(path) + "):\n");
+				System.out.println(aStar.getGraphicArea(path));
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found: " + e.getMessage());
+		} catch (NumberFormatException e) {
+			System.out.println("Bad input: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("Unexpected error: " + e.getMessage());
+		}
 	}
 
 	/**
-	 * Gera um cenário com 6 linhas, 7 colunas e 3 blocos.
+	 * Split @param line with "-" and gets row and column respectively.
 	 * 
-	 * @return cenário gerado
+	 * @param line line read by the file
+	 * @return Node object based in the @param line
 	 */
-	public static AStar getExample1() {
-		int rows = 6;
-		int cols = 7;
-		Node initialNode = new Node(2, 1);
-		Node finalNode = new Node(2, 5);
-		AStar aStar = new AStar(rows, cols, initialNode, finalNode);
-		int[][] blocksArray = new int[][] { { 1, 3 }, { 2, 3 }, { 3, 3 } };
-		aStar.setBlocks(blocksArray);
-		return aStar;
-	}
-
-	/**
-	 * Gera um cenário com 7 linhas, 4 colunas e 3 blocos.
-	 * 
-	 * @return cenário gerado
-	 */
-	public static AStar getExample2() {
-		int rows = 7;
-		int cols = 4;
-		Node initialNode = new Node(1, 0);
-		Node finalNode = new Node(5, 2);
-		AStar aStar = new AStar(rows, cols, initialNode, finalNode);
-		int[][] blocksArray = new int[][] { { 2, 1 }, { 3, 1 }, { 4, 1 } };
-		aStar.setBlocks(blocksArray);
-		return aStar;
-	}
-
-	/**
-	 * Gera um cenário com 7 linhas, 4 colunas e 4 blocos.
-	 * 
-	 * @return cenário gerado
-	 */
-	public static AStar getExample3() {
-		int rows = 7;
-		int cols = 4;
-		Node initialNode = new Node(1, 0);
-		Node finalNode = new Node(5, 2);
-		AStar aStar = new AStar(rows, cols, initialNode, finalNode);
-		int[][] blocksArray = new int[][] { { 2, 1 }, { 3, 1 }, { 4, 1 }, { 5, 1 } };
-		aStar.setBlocks(blocksArray);
-		return aStar;
+	private static Node getNodeByInput(String line) {
+		String[] parts = line.split("-");
+		int row = Integer.parseInt(parts[0].trim());
+		int col = Integer.parseInt(parts[1].trim());
+		return new Node(row, col);
 	}
 
 }
