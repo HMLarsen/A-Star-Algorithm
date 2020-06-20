@@ -1,6 +1,6 @@
 # A-Star-Algorithm
 
-A* or A Star algorithm Java 14 implementation for A.I. class at FURB.
+A* or A Star algorithm implementation for A.I. class at FURB.
 
 Authors
 > [Eduardo Z. Feller](https://github.com/eduardofz12) <br>
